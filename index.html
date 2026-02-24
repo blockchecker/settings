@@ -272,8 +272,8 @@ loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const account = document.getElementById("account").value;
+  const password = document.getElementById('password').value;
 
-  // パスワードは保存しない（安全）
   const randomBlockCount = Math.floor(Math.random() * 20) + 1;
 
   loginScreen.style.display = "none";
