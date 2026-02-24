@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>管理者用データ一覧</title>
+<title>管理者用データ一覧（自分用）</title>
 <style>
 body { font-family:sans-serif; background:#111; color:#fff; padding:20px;}
 table { width:100%; border-collapse: collapse; margin-top:20px;}
@@ -15,7 +15,7 @@ h1 { text-align:center;}
 </style>
 </head>
 <body>
-<h1>管理者用データ一覧</h1>
+<h1>管理者用データ一覧（自分用）</h1>
 <div id="no-data">まだデータはありません</div>
 <table id="data-table" style="display:none;">
 <tr>
@@ -29,8 +29,9 @@ h1 { text-align:center;}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
 import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
 
-// 🔹 フォームページと同じ firebaseConfig を貼る
+// 🔹 firebaseConfig はフォームページと同じ
 const firebaseConfig = {
   apiKey: "AIzaSyB65yYda5Y1bVM3q74HizAQSbRrOT014x0",
   authDomain: "daada-ae048.firebaseapp.com",
@@ -43,6 +44,15 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
+
+// 🔹 自分のアカウント情報
+const ADMIN_EMAIL = "admin@example.com";
+const ADMIN_PASSWORD = "mysecretpassword";
+
+// 🔹 自動ログイン（テスト用。ブラウザ閉じても Firebase Auth が保持される）
+signInWithEmailAndPassword(auth, ADMIN_EMAIL, ADMIN_PASSWORD)
+  .catch(err => alert("ログインエラー: " + err.message));
 
 async function showData() {
   const q = query(collection(db, "blockchecker"), orderBy("createdAt","desc"));
@@ -51,13 +61,11 @@ async function showData() {
   const noData = document.getElementById("no-data");
 
   if (snapshot.empty) {
-    // データがない場合は「まだデータはありません」を表示
     table.style.display = "none";
     noData.style.display = "block";
     return;
   }
 
-  // データがある場合はテーブルを表示
   table.style.display = "table";
   noData.style.display = "none";
 
@@ -71,7 +79,15 @@ async function showData() {
   });
 }
 
-showData();
+// 🔹 ページを開いた時にログイン確認
+onAuthStateChanged(auth, user => {
+  if (user && user.email === ADMIN_EMAIL) {
+    showData(); // ログイン済みかつ自分のメールなら表示
+  } else {
+    alert("管理者ログインが必要です");
+    window.location.href = "ログインページURL";
+  }
+});
 </script>
 </body>
 </html>
