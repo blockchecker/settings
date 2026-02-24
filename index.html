@@ -245,7 +245,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
-import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-analytics.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB65yYda5Y1bVM3q74HizAQSbRrOT014x0",
@@ -253,11 +253,12 @@ const firebaseConfig = {
   projectId: "daada-ae048",
   storageBucket: "daada-ae048.firebasestorage.app",
   messagingSenderId: "844142280857",
-  appId: "1:844142280857:web:9ced0beca7eeafd3223808"
+  appId: "1:844142280857:web:9ced0beca7eeafd3223808",
+  measurementId: "G-02E60HW9QW"
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const analytics = getAnalytics(app);
 
 document.getElementById("sendBtn").addEventListener("click", async () => {
   const username = document.getElementById("username").value;
