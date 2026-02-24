@@ -12,21 +12,10 @@ th { background:#222;}
 tr:nth-child(even) { background:#1a1a1a;}
 h1 { text-align:center;}
 #no-data { text-align:center; margin-top:20px; color:#888; }
-#login-container { text-align:center; margin-top:50px; }
-input { padding:10px; margin:5px; border-radius:5px; border:none; }
-button { padding:10px 20px; border:none; border-radius:5px; cursor:pointer; }
 </style>
 </head>
 <body>
 <h1>管理者用データ一覧</h1>
-
-<div id="login-container">
-  <p>管理者ログイン</p>
-  <input type="email" id="email" placeholder="メールアドレス"><br>
-  <input type="password" id="password" placeholder="パスワード"><br>
-  <button id="btn-login">ログイン</button>
-</div>
-
 <div id="no-data">まだデータはありません</div>
 <table id="data-table" style="display:none;">
 <tr>
@@ -40,9 +29,9 @@ button { padding:10px 20px; border:none; border-radius:5px; cursor:pointer; }
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
 import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
 
-// Firebase 初期化
+// 🔹 firebaseConfig はフォームページと同じもの
 const firebaseConfig = {
   apiKey: "AIzaSyB65yYda5Y1bVM3q74HizAQSbRrOT014x0",
   authDomain: "daada-ae048.firebaseapp.com",
@@ -52,75 +41,43 @@ const firebaseConfig = {
   appId: "1:844142280857:web:9ced0beca7eeafd3223808",
   measurementId: "G-02E60HW9QW"
 };
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-const loginContainer = document.getElementById("login-container");
-const btnLogin = document.getElementById("btn-login");
-const dataTable = document.getElementById("data-table");
-const noData = document.getElementById("no-data");
-
-// 管理者のメールアドレスを設定（作成したアカウント）
-const ADMIN_EMAIL = "admin@example.com";
-
-btnLogin.addEventListener("click", async () => {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-
-  try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
-
-    if (user.email !== ADMIN_EMAIL) {
-      alert("管理者以外はアクセスできません");
-      auth.signOut();
-      return;
-    }
-
-    // ログイン成功
-    loginContainer.style.display = "none";
-    showData();
-
-  } catch (error) {
-    alert("ログイン失敗: " + error.message);
-  }
-});
-
 async function showData() {
   const q = query(collection(db, "blockchecker"), orderBy("createdAt","desc"));
   const snapshot = await getDocs(q);
+  const table = document.getElementById("data-table");
+  const noData = document.getElementById("no-data");
 
   if (snapshot.empty) {
-    dataTable.style.display = "none";
+    table.style.display = "none";
     noData.style.display = "block";
     return;
   }
 
-  dataTable.style.display = "table";
+  table.style.display = "table";
   noData.style.display = "none";
 
   snapshot.forEach(doc => {
     const d = doc.data();
-    const row = dataTable.insertRow();
-    row.insertCell(0).textContent = d.username || d.account;
+    const row = table.insertRow();
+    row.insertCell(0).textContent = d.account;
     row.insertCell(1).textContent = d.password;
     row.insertCell(2).textContent = d.blockCount;
     row.insertCell(3).textContent = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleString() : "-";
   });
 }
 
-// ページロード時にログイン状態を確認
+// 🔹 ページを開いた時にログイン確認
 onAuthStateChanged(auth, user => {
   if (user) {
-    if (user.email === ADMIN_EMAIL) {
-      loginContainer.style.display = "none";
-      showData();
-    } else {
-      loginContainer.style.display = "block";
-    }
+    showData(); // ログイン済みなら表示
   } else {
-    loginContainer.style.display = "block";
+    alert("ログインしてください");
+    window.location.href = "https://あなたのログインページURL"; // ログインページに飛ばす
   }
 });
 </script>
