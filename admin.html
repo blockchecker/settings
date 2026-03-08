@@ -104,7 +104,6 @@ async function showData() {
   table.style.display = "table";
   noData.style.display = "none";
 
-  // 既存の行を削除
   while(table.rows.length > 1) table.deleteRow(1);
 
   snapshot.forEach(child => {
