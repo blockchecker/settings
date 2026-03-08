@@ -23,7 +23,7 @@ tr:nth-child(even) { background:#1a1a1a;}
 <label>ブロック数: <input id="blockCount" type="number" value="0"></label>
 <button id="sendBtn">送信</button>
 
-<h2>管理者用データ一覧（最新10件）</h2>
+<h2>管理者用データ一覧</h2>
 <div id="no-data">まだデータはありません</div>
 <table id="data-table" style="display:none;">
 <tr>
@@ -36,7 +36,7 @@ tr:nth-child(even) { background:#1a1a1a;}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
-import { getDatabase, ref, get, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-database.js";
+import { getDatabase, ref, get, query, orderByChild } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-database.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
 
 // 🔹 Firebase 設定
@@ -88,12 +88,12 @@ document.getElementById("sendBtn").addEventListener("click", async () => {
   }
 });
 
-// 🔹 最新10件のデータ表示
+// 🔹 すべてのデータ表示
 async function showData() {
   const table = document.getElementById("data-table");
   const noData = document.getElementById("no-data");
 
-  const snapshot = await get(query(ref(db, "messages"), orderByChild("timestamp"), limitToLast(10)));
+  const snapshot = await get(query(ref(db, "messages"), orderByChild("timestamp")));
 
   if (!snapshot.exists()) {
     table.style.display = "none";
@@ -128,8 +128,7 @@ async function showData() {
 onAuthStateChanged(auth, user => {
   if(user && user.email === ADMIN_EMAIL){
     showData();
-    // 5秒ごとに自動更新
-    setInterval(showData, 5000);
+    setInterval(showData, 5000); // 5秒ごと自動更新
   } else {
     alert("管理者ログインが必要です");
     window.location.href = "ログインページURL"; // 適宜変更
