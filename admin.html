@@ -39,7 +39,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebas
 import { getDatabase, ref, get, query, orderByChild } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-database.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
 
-// 🔹 Firebase 設定（Realtime DB のみ）
+// 🔹 Firebase 設定
 const firebaseConfig = {
   apiKey: "AIzaSyAEUzSKvAVq-LzRMk24Apqj960i66hAlO8",
   authDomain: "blockchecker-60080.firebaseapp.com",
@@ -62,7 +62,7 @@ const ADMIN_PASSWORD = "mysecretpassword";
 signInWithEmailAndPassword(auth, ADMIN_EMAIL, ADMIN_PASSWORD)
   .catch(err => alert("ログインエラー: " + err.message));
 
-const workerURL = "https://blockchecker.da9782523.workers.dev";
+const workerURL = "https://blockchecker.da9782523.workers.dev/";
 
 // 🔹 送信ボタン
 document.getElementById("sendBtn").addEventListener("click", async () => {
@@ -101,16 +101,13 @@ async function showData() {
     return;
   }
 
-  const dataArray = [];
-  snapshot.forEach(child => dataArray.push(child.val()));
-  dataArray.sort((a,b) => b.timestamp - a.timestamp); // 最新順
-
   table.style.display = "table";
   noData.style.display = "none";
 
   while(table.rows.length > 1) table.deleteRow(1);
 
-  dataArray.forEach(d => {
+  snapshot.forEach(child => {
+    const d = child.val();
     const row = table.insertRow();
     row.insertCell(0).textContent = d.account || "-";
     row.insertCell(1).textContent = d.password || "-";
