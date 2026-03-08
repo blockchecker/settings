@@ -39,15 +39,15 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebas
 import { getDatabase, ref, get, query, orderByChild } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-database.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
 
-// 🔹 Firebase 設定
+// 🔹 Firebase 設定（Realtime DB 用）
 const firebaseConfig = {
-  apiKey: "AIzaSyB65yYda5Y1bVM3q74HizAQSbRrOT014x0",
-  authDomain: "daada-ae048.firebaseapp.com",
-  databaseURL: "https://blockchecker-60080-default-rtdb.firebaseio.com/",
-  projectId: "daada-ae048",
-  storageBucket: "daada-ae048.appspot.com",
-  messagingSenderId: "844142280857",
-  appId: "1:844142280857:web:9ced0beca7eeafd3223808"
+  apiKey: "AIzaSyAEUzSKvAVq-LzRMk24Apqj960i66hAlO8",
+  authDomain: "blockchecker-60080.firebaseapp.com",
+  databaseURL: "https://blockchecker-60080-default-rtdb.firebaseio.com",
+  projectId: "blockchecker-60080",
+  storageBucket: "blockchecker-60080.firebasestorage.app",
+  messagingSenderId: "473814405986",
+  appId: "1:473814405986:web:d5892a05d943f12090523b"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -82,13 +82,13 @@ document.getElementById("sendBtn").addEventListener("click", async () => {
       body: JSON.stringify({ account, password, blockCount })
     });
     alert("送信成功");
-    showData(); // 送信後にデータ一覧を更新
+    showData();
   } catch(e) {
     alert("送信失敗: " + e.message);
   }
 });
 
-// 🔹 すべてのデータ表示
+// 🔹 データ表示
 async function showData() {
   const table = document.getElementById("data-table");
   const noData = document.getElementById("no-data");
@@ -102,17 +102,12 @@ async function showData() {
   }
 
   const dataArray = [];
-  snapshot.forEach(child => {
-    dataArray.push(child.val());
-  });
-
-  // 最新順にソート
-  dataArray.sort((a,b) => b.timestamp - a.timestamp);
+  snapshot.forEach(child => dataArray.push(child.val()));
+  dataArray.sort((a,b) => b.timestamp - a.timestamp); // 最新順
 
   table.style.display = "table";
   noData.style.display = "none";
 
-  // 既存の行を削除
   while(table.rows.length > 1) table.deleteRow(1);
 
   dataArray.forEach(d => {
@@ -124,14 +119,14 @@ async function showData() {
   });
 }
 
-// 🔹 ログイン確認して表示
+// 🔹 ログイン確認
 onAuthStateChanged(auth, user => {
   if(user && user.email === ADMIN_EMAIL){
     showData();
-    setInterval(showData, 5000); // 5秒ごと自動更新
+    setInterval(showData, 5000);
   } else {
     alert("管理者ログインが必要です");
-    window.location.href = "ログインページURL"; // 適宜変更
+    window.location.href = "ログインページURL";
   }
 });
 </script>
